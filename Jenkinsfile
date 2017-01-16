@@ -1,11 +1,12 @@
-node('large') {
+node() {
 
     try {
-        if (env.BRANCH_NAME == 'master') {
+        if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME.startsWith("hotfix/")) {
 
             stage('Git') {
+                sh """echo "building branch: ${env.BRANCH_NAME}" """
                 checkout([$class                           : 'GitSCM',
-                          branches                         : [[name: '*/master']],
+                          branches                         : [[name: "*/${env.BRANCH_NAME}"]],
                           doGenerateSubmoduleConfigurations: false,
                           extensions                       : [],
                           submoduleCfg                     : [],
