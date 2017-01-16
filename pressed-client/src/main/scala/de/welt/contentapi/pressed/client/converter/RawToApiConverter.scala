@@ -104,7 +104,8 @@ class RawToApiConverter @Inject()(inheritanceCalculator: InheritanceCalculator) 
     ApiCommercialConfiguration(
       pathForAdTag = Some(calculatePathForAdTag(rawChannel)),
       pathForVideoAdTag = Some(calculatePathForVideoAdTag(rawChannel)),
-      thirdParty = Some(thirdPartyCommercialFromRawChannelCommercial(rawChannel.config.commercial))
+      thirdParty = Some(thirdPartyCommercialFromRawChannelCommercial(rawChannel.config.commercial)),
+      adIndicator = rawChannel.config.header.map(_.adIndicator)
     )
   }
 

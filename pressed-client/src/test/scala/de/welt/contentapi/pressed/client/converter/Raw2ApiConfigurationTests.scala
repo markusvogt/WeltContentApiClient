@@ -24,7 +24,8 @@ class Raw2ApiConfigurationTests extends FlatSpec with Matchers {
       header = Some(
         RawChannelHeader(
           label = Some("label"),
-          sectionReferences = Some(Seq(RawSectionReference(Some("Label"), Some("/Path/"))))
+          sectionReferences = Some(Seq(RawSectionReference(Some("Label"), Some("/Path/")))),
+          adIndicator = true
         )
       ),
       sponsoring = RawChannelSponsoring(
@@ -65,9 +66,12 @@ class Raw2ApiConfigurationTests extends FlatSpec with Matchers {
   "ApiCommercialConfiguration" must "have 3rd-Party configuration with default values from Raw Constructor" in new TestScopeConfiguration {
     val apiConfiguration: ApiConfiguration = converter.apiConfigurationFromRawChannel(node100)
     // node has no explicit configuration
-    val apiThirdParty: ApiCommercial3rdPartyConfiguration = apiConfiguration.commercial.flatMap(_.thirdParty).getOrElse(throw new RuntimeException("Test failed!"))
+    val commercialConfiguration: ApiCommercialConfiguration = apiConfiguration.commercial.getOrElse(throw new RuntimeException("Test failed!"))
+    val apiThirdParty: ApiCommercial3rdPartyConfiguration = commercialConfiguration.thirdParty.getOrElse(throw new RuntimeException("Test failed!"))
     val apiTaboola: ApiCommercialTaboolaConfiguration = apiThirdParty.contentTaboola.getOrElse(throw new RuntimeException("Test failed!"))
     val defaultsFromRaw = RawChannelCommercial()
+
+    commercialConfiguration.adIndicator shouldBe Some(true)
     apiTaboola.showNews shouldBe Some(defaultsFromRaw.contentTaboola.showNews)
     apiTaboola.showWeb shouldBe Some(defaultsFromRaw.contentTaboola.showWeb)
     apiTaboola.showNetwork shouldBe Some(defaultsFromRaw.contentTaboola.showNetwork)
