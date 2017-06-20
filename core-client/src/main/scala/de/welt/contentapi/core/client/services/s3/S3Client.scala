@@ -8,37 +8,34 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model._
 import com.amazonaws.util.StringInputStream
 import de.welt.contentapi.utils.Loggable
-import play.api.{Configuration, Environment, Mode}
+import play.api.{Configuration, Environment}
 
 import scala.io.{Codec, Source}
 
 sealed trait S3Client extends Loggable {
+
+  private val EndpointConfigKey = "welt.aws.s3.endpoint"
 
   val config: Configuration
   val environment: Environment
   implicit val codec: Codec = Codec.UTF8
 
   val client: AmazonS3Client = {
-    val endpointConfigKey = "welt.aws.s3.endpoint"
-    val maybeS3Client = for {
-      endpoint ← config.getString(endpointConfigKey)
-    } yield {
-      val s3Client = environment.mode match {
-        case Mode.Prod ⇒ new AmazonS3Client()
-        case _ ⇒ new AmazonS3Client(
-          new BasicAWSCredentials(
-            config.getString("welt.aws.s3.dev.accessKey")
-              .getOrElse(throw config.reportError("welt.aws.s3.dev.accessKey", "You need to provide aws credentials (welt.aws.s3.dev.accessKey) in DEV/TEST mode")),
-            config.getString("welt.aws.s3.dev.secretKey")
-              .getOrElse(throw config.reportError("welt.aws.s3.dev.secretKey", "You need to provide aws credentials (welt.aws.s3.dev.secretKey) in DEV/TEST mode"))
-          )
+    val endpoint = config.get[String](EndpointConfigKey)
+    val clazz = classOf[Environment]
+    println("Environment jar" + clazz.getResource("/" + clazz.getName.replace('.', '/') + ".class"))
+    val s3Client = environment.mode match {
+      case play.api.Mode.Prod ⇒ new AmazonS3Client()
+      case _ ⇒ new AmazonS3Client(
+        new BasicAWSCredentials(
+          config.get[String]("welt.aws.s3.dev.accessKey"),
+          config.get[String]("welt.aws.s3.dev.secretKey")
         )
-      }
-      s3Client.setEndpoint(endpoint)
-      log.debug(s"s3 connected to $endpoint")
-      s3Client
+      )
     }
-    maybeS3Client.getOrElse(throw config.reportError(endpointConfigKey, s"You need to set the AWS s3 endpoint at $endpointConfigKey"))
+    s3Client.setEndpoint(endpoint)
+    log.debug(s"s3 connected to $endpoint")
+    s3Client
   }
 
   def get(bucket: String, key: String): Option[String] = withS3Result(bucket, key)({
@@ -57,7 +54,7 @@ sealed trait S3Client extends Loggable {
     result ⇒ result.getObjectMetadata.getLastModified.toInstant
   })
 
-  def putPrivate(bucket: String, key: String, value: String, contentType: String) = {
+  def putPrivate(bucket: String, key: String, value: String, contentType: String): Unit = {
     //    log.info(s"put($key, $value, $contentType)")
     put(bucket, key, value, contentType)
   }

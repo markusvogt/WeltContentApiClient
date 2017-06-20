@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0 (2017-06-20)
+
+#### Breaking Changes
+
+- Playframework 2.6 ()dropped 2.4 & 2.5)
+- Scala 2.12 (dropped 2.11)
+
 ## 0.14.0 (2017-04-12)
 
 #### Breaking Changes

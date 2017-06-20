@@ -5,31 +5,32 @@ import com.kenshoo.play.metrics.Metrics
 import de.welt.contentapi.core.client.models.{ApiContentSearch, MainTypeParam}
 import de.welt.contentapi.core.client.services.exceptions.{HttpClientErrorException, HttpRedirectException, HttpServerErrorException}
 import de.welt.contentapi.core.client.services.http.RequestHeaders
-import org.mockito.Matchers
+import org.mockito.{ArgumentMatcher, Matchers}
 import org.mockito.Matchers.anyString
 import org.mockito.Mockito.{verify, when}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.Configuration
 import play.api.http.{HeaderNames, Status}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.{JsLookupResult, JsResult, JsString}
+import play.api.libs.ws.ahc.AhcWSRequest
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest, WSResponse}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
-class AbstractServiceTest extends PlaySpec
-  with MockitoSugar with Status {
+class AbstractServiceTest extends PlaySpec with MockitoSugar with Status {
 
   trait TestScope {
-    val mockWsClient = mock[WSClient]
-    val mockRequest = mock[WSRequest]
-    val responseMock = mock[WSResponse]
-    val metricsMock = mock[Metrics]
-    val mockTimerContext = mock[Context]
 
-    when(mockRequest.withHeaders(Matchers.anyVararg[(String, String)])).thenReturn(mockRequest)
+    val mockWsClient: WSClient = mock[WSClient]
+    val mockRequest: AhcWSRequest = mock[AhcWSRequest]
+    val responseMock: WSResponse = mock[WSResponse]
+    val metricsMock: Metrics = mock[Metrics]
+    val mockTimerContext: Context = mock[Context]
+
+    when(mockRequest.withHeaders(Matchers.anyVararg())).thenReturn(mockRequest)
     when(mockRequest.withQueryString(Matchers.anyVararg[(String, String)])).thenReturn(mockRequest)
     when(mockRequest.withAuth(anyString, anyString, Matchers.eq(WSAuthScheme.BASIC))).thenReturn(mockRequest)
 
@@ -42,6 +43,7 @@ class AbstractServiceTest extends PlaySpec
   }
 
   trait TestScopeBasicAuth extends TestScope {
+
     class TestService extends AbstractService[String] {
       override val serviceName: String = "test"
       override val configuration: Configuration = TestServiceBasicAuth.configuration
@@ -51,8 +53,11 @@ class AbstractServiceTest extends PlaySpec
 
       override protected def initializeMetricsContext(name: String): Context = mockTimerContext
     }
+
   }
+
   trait TestScopeApiKey extends TestScope {
+
     class TestService extends AbstractService[String] {
       override val serviceName: String = "test"
       override val configuration: Configuration = TestServiceApiKeyOverridesBasicAuthConfig.configuration
@@ -62,6 +67,7 @@ class AbstractServiceTest extends PlaySpec
 
       override protected def initializeMetricsContext(name: String): Context = mockTimerContext
     }
+
   }
 
   object TestServiceBasicAuth {

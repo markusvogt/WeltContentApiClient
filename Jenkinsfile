@@ -36,7 +36,7 @@ node('large') {
                 } finally {
                     step([
                             $class    : 'ScoveragePublisher',
-                            reportDir : 'target/scala-2.11/scoverage-report',
+                            reportDir : 'target/scala-2.12/scoverage-report',
                             reportFile: 'scoverage.xml'
                     ])
                 }

@@ -4,7 +4,7 @@ import de.welt.contentapi.core.client.services.s3.S3Client
 import de.welt.contentapi.utils.Env
 import de.welt.testing.DisabledCache
 import org.mockito.{Matchers, Mockito}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.{Configuration, Environment, Mode}
 

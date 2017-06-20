@@ -19,10 +19,10 @@ class SectionServiceTest extends PlaySpec with MockitoSugar {
     val root = SdpSectionData("/", "root", None, Seq(childOfRoot), 0)
 
     val bucket = "le-bucket"
-    val file = "le-file"
+    val folder = "le-folder"
     val config = Configuration(
       RawTreeServiceImpl.bucketConfigKey → bucket,
-      RawTreeServiceImpl.fileConfigKey → file
+      RawTreeServiceImpl.folderConfigKey → folder
     )
 
     val emptyS3ResponseMock = mock[S3Client]

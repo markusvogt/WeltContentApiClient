@@ -6,9 +6,9 @@ import scoverage.ScoverageSbtPlugin.autoImport._
 
 import scala.util.Properties
 
-val isSnapshot = true
+val isSnapshot = false
 val PlayVersion = "2.6.0-M2"
-val actualVersion: String = s"0.16.${Properties.envOrElse("BUILD_NUMBER", "5-SNAPSHOT")}"
+val actualVersion: String = s"1.0.${Properties.envOrElse("BUILD_NUMBER", "0-SNAPSHOT")}"
 
 def withTests(project: Project) = project % "test->test;compile->compile"
 
@@ -18,9 +18,17 @@ val frontendCompilationSettings = Seq(
   version in ThisBuild := s"${actualVersion}_${PlayVersion}${if (isSnapshot) "-SNAPSHOT" else ""}",
 
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
-  javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
+  javacOptions ++= Seq("-deprecation", "-source", "1.8", "-target", "1.8"),
   publishArtifact in Test := false,
-  promptTheme := com.scalapenos.sbt.prompt.PromptThemes.ScalapenosTheme
+  promptTheme := com.scalapenos.sbt.prompt.PromptThemes.ScalapenosTheme,
+
+  fork in Test := true,
+  javaOptions in Test += "-Xmx2048M",
+  javaOptions in Test += "-XX:+UseConcMarkSweepGC",
+  javaOptions in Test += "-XX:ReservedCodeCacheSize=128m",
+  javaOptions in Test += "-XX:MaxMetaspaceSize=512m",
+  javaOptions in Test += "-Duser.timezone=Europe/Berlin",
+  baseDirectory in Test := file(".")
 )
 
 val frontendDependencyManagementSettings = Seq(
@@ -35,29 +43,30 @@ val frontendDependencyManagementSettings = Seq(
 
 val coreDependencySettings = Seq(
   libraryDependencies ++= Seq(
-    "com.typesafe.play" %% "play" % PlayVersion % Provided,
+    "com.typesafe.play" %% "play-json" % "2.6.0-RC2" % Provided,
     "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
-    "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0-RC1" % Test,
-    "org.mockito" % "mockito-core" % "1.10.19" % Test,
-    "com.typesafe.play" %% "play-cache" % PlayVersion % Provided,
+    "com.typesafe.play" %% "play-cache" % "2.6.0-RC2" % Provided,
     // Info:
     // Prevent compile warnings of: `Class javax.annotation.Nullable not found - continuing with a stub.`
     "com.google.code.findbugs" % "jsr305" % "3.0.1" % Compile,
-    "com.google.inject" % "guice" % "4.1.0"
+    "com.google.inject" % "guice" % "4.1.0",
+
+    "org.mockito" % "mockito-core" % "1.10.19" % Test,
+    "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0-RC1" % Test
   )
 )
 val clientDependencySettings = Seq(
   libraryDependencies ++= Seq(
-    "org.asynchttpclient" % "async-http-client" % "2.0.10",
-    "ch.qos.logback" % "logback-classic" % "1.1.7",
+    "org.asynchttpclient" % "async-http-client" % "2.0.32",
+    "ch.qos.logback" % "logback-classic" % "1.2.3",
 
-    "com.amazonaws" % "aws-java-sdk-core" % "1.11.13",
-    "com.amazonaws" % "aws-java-sdk-s3" % "1.11.13",
+    "com.amazonaws" % "aws-java-sdk-core" % "1.11.150",
+    "com.amazonaws" % "aws-java-sdk-s3" % "1.11.150",
 
     "com.typesafe" % "config" % "1.3.0" % Provided,
 
-    "com.typesafe.play" %% "play-ws" % PlayVersion % Provided,
-    "com.typesafe.play" %% "play-cache" % PlayVersion % Provided,
+    "com.typesafe.play" %% "play-ws" % "2.6.0-RC2" % Provided,
+    "com.typesafe.play" %% "play-cache" % "2.6.0-RC2" % Provided,
     "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
 
     "de.welt" %% "metrics-play" % "2.6.0-M2_32",

@@ -8,7 +8,7 @@ import de.welt.contentapi.core.client.services.s3.S3Client
 import de.welt.contentapi.raw.models.{ChannelUpdate, RawChannel}
 import de.welt.contentapi.utils.Env.{Env, Live, Preview}
 import de.welt.contentapi.utils.Loggable
-import play.api.cache.CacheApi
+import play.api.cache.{CacheApi, SyncCacheApi}
 import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Environment}
 
@@ -30,7 +30,7 @@ class AdminSectionServiceImpl @Inject()(config: Configuration,
                                         s3: S3Client,
                                         environment: Environment,
                                         legacySectionService: SdpSectionDataService,
-                                        cache: CacheApi)
+                                        cache: SyncCacheApi)
   extends RawTreeServiceImpl(s3, config, environment, cache) with AdminSectionService with Loggable {
 
   override def updateChannel(channel: RawChannel, channelWithUpdates: RawChannel, user: String)
