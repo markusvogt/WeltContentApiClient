@@ -7,7 +7,7 @@ import scoverage.ScoverageSbtPlugin.autoImport._
 import scala.util.Properties
 
 val isSnapshot = false
-val PlayVersion = "2.6.0-M2"
+val PlayVersion = "2.6.0-RC2"
 val actualVersion: String = s"1.0.${Properties.envOrElse("BUILD_NUMBER", "0-SNAPSHOT")}"
 
 def withTests(project: Project) = project % "test->test;compile->compile"
@@ -69,7 +69,7 @@ val clientDependencySettings = Seq(
     "com.typesafe.play" %% "play-cache" % "2.6.0-RC2" % Provided,
     "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
 
-    "de.welt" %% "metrics-play" % "2.6.0-M2_32",
+    "de.welt" %% "metrics-play" % "2.6.0-RC2_33",
 
     "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0-RC1" % Test,
     "org.mockito" % "mockito-core" % "1.10.19" % Test
