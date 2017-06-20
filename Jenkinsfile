@@ -1,40 +1,37 @@
 node('large') {
 
+    stage('Git') {
+        checkout scm
+    }
+
+    stage('Check') {
+        wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
+            sh "./sbt clean test"
+        }
+    }
+
     try {
-        if (env.BRANCH_NAME == 'master') {
+        if (env.BRANCH_NAME == 'play_2_6') {
 
-            stage('Git') {
-                checkout([$class                           : 'GitSCM',
-                          branches                         : [[name: '*/master']],
-                          doGenerateSubmoduleConfigurations: false,
-                          extensions                       : [],
-                          submoduleCfg                     : [],
-                          userRemoteConfigs                : [[
-                              url: 'https://github.com/WeltN24/WeltContentApiClient.git',
-                              credentialsId: 'ci-weltn24_2017-02-28'
-                          ]]
-                ])
-            }
-
-            stage('test') {
+            stage('Test') {
                 try {
                     wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-                        sh './activator scalastyle'
+                        sh './sbt scalastyle'
                     }
                 } finally {
                     step([$class: 'CheckStylePublisher', pattern: '**/scalastyle-result.xml'])
                 }
                 try {
                     wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-                        sh './activator clean coverage test'
+                        sh './sbt clean coverage test'
                     }
                 } finally {
-                    step([$class: 'JUnitResultArchiver', testResults: '**/target/test-reports/*.xml'])
+                    junit '**/target/test-reports/*.xml'
                 }
                 try {
                     wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-                        sh './activator coverageReport'
-                        sh './activator coverageAggregate'
+                        sh './sbt coverageReport'
+                        sh './sbt coverageAggregate'
                     }
                 } finally {
                     step([
@@ -46,59 +43,22 @@ node('large') {
             }
 
 
-            stage('Credential Setup Bintray') {
-                withCredentials([[$class: 'StringBinding', credentialsId: 'BINTRAY_API_KEY_CI_WELTN24', variable: 'BINTRAY_API_KEY_CI_WELTN24']]) {
-                    sh """
-                    rm -f ~/.bintray/.credentials || true
-                    mkdir -p ~/.bintray
-                    touch ~/.bintray/.credentials
-                    echo -e 'realm = Bintray API Realm' >> ~/.bintray/.credentials
-                    echo -e 'host = api.bintray.com' >> ~/.bintray/.credentials
-                    echo -e 'user = ci-weltn24' >> ~/.bintray/.credentials
-                    echo -n 'password = ' >> ~/.bintray/.credentials
-                """
-                    sh "echo -e  " + env.BINTRAY_API_KEY_CI_WELTN24 + " >> ~/.bintray/.credentials"
-                }
-            }
 
-            stage('Publish to bintray.com') {
+            stage('Publish') {
+                withCredentials([[$class: 'StringBinding', credentialsId: 'BINTRAY_API_KEY_CI_WELTN24', variable: 'BINTRAY_API_KEY_CI_WELTN24']]) {
+                    writeFile file: '~/.bintray/.credentials', text: """realm = Bintray API Realm
+host = api.bintray.com
+user = ci-weltn24
+password = ${env.BINTRAY_API_KEY_CI_WELTN24}"""
+                }
+
                 wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-                    sh './activator publish'
-                    sh 'PLAY24=true ./activator publish'
+                    sh './sbt publish'
                 }
                 slackSend channel: 'section-tool-2', message: "Successfully published a new WeltContentApiClient version: ${env.BUILD_URL}"
             }
 
-        } else {
-
-            stage('Git') {
-                echo """" Checking out "origin/pr/${env.CHANGE_ID}/merge". """
-
-                checkout changelog: true, poll: false, scm: [
-                        $class                           : 'GitSCM',
-                        branches                         : [[ name: "origin/pr/${env.CHANGE_ID}/merge" ]],
-                        doGenerateSubmoduleConfigurations: false,
-                        extensions                       : [],
-                        submoduleCfg                     : [],
-                        userRemoteConfigs                : [[
-                            refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
-                            url: 'https://github.com/WeltN24/WeltContentApiClient.git',
-                            credentialsId: 'ci-weltn24_2017-02-28'
-                        ]]
-                ]
-            }
-
-
-            stage('Check') {
-                wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-                    sh """#!/bin/bash
-                    ./activator clean test
-                """
-                }
-            }
-
         }
-
     } catch (Exception e) {
         slackSend channel: 'section-tool-2', message: "Build failed: ${env.BUILD_URL}"
         throw e
