@@ -1,4 +1,4 @@
-node {
+node('medium') {
 
     stage('Git') {
         checkout scm
