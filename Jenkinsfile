@@ -4,9 +4,11 @@ node('medium') {
         checkout scm
     }
 
-    stage('Check') {
-        wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-            sh "./sbt clean test"
+    if (env.BRANCH_NAME.startsWith('PR-')) {
+        stage('Check') {
+            wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
+                sh "./sbt clean test"
+            }
         }
     }
 
