@@ -7,7 +7,7 @@ import scoverage.ScoverageSbtPlugin.autoImport._
 import scala.util.Properties
 
 val isSnapshot = false
-val PlayVersion = "2.6.0-RC2"
+val PlayVersion = "2.6.2"
 val actualVersion: String = s"1.0.${Properties.envOrElse("BUILD_NUMBER", "0-SNAPSHOT")}"
 
 def withTests(project: Project) = project % "test->test;compile->compile"
