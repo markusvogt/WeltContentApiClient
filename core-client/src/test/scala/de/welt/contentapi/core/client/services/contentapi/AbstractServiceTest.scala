@@ -30,8 +30,8 @@ class AbstractServiceTest extends PlaySpec with MockitoSugar with Status {
     val metricsMock: Metrics = mock[Metrics]
     val mockTimerContext: Context = mock[Context]
 
-    when(mockRequest.withHeaders(Matchers.anyVararg())).thenReturn(mockRequest)
-    when(mockRequest.withQueryString(Matchers.anyVararg[(String, String)])).thenReturn(mockRequest)
+    when(mockRequest.withHttpHeaders(Matchers.anyVararg())).thenReturn(mockRequest)
+    when(mockRequest.withQueryStringParameters(Matchers.anyVararg[(String, String)])).thenReturn(mockRequest)
     when(mockRequest.withAuth(anyString, anyString, Matchers.eq(WSAuthScheme.BASIC))).thenReturn(mockRequest)
 
     when(mockRequest.get()).thenReturn(Future {
@@ -99,7 +99,7 @@ class AbstractServiceTest extends PlaySpec with MockitoSugar with Status {
     "forward the X-Unique-Id header" in new TestScopeBasicAuth {
       val headers = Seq(("X-Unique-Id", "0xdeadbeef"))
       new TestService().get(Seq("fake-id"), Seq.empty)(headers, defaultContext)
-      verify(mockRequest).withHeaders(("X-Unique-Id", "0xdeadbeef"))
+      verify(mockRequest).withHttpHeaders(("X-Unique-Id", "0xdeadbeef"))
     }
 
     "forward the basic auth data" in new TestScopeBasicAuth {
@@ -113,18 +113,18 @@ class AbstractServiceTest extends PlaySpec with MockitoSugar with Status {
       private val service = new TestService()
       service.get(Seq("fake-id"), Seq("foo" -> "bar"))
       service.config.credentials.left.getOrElse("")
-      verify(mockRequest).withHeaders(("x-api-key", "foo"))
+      verify(mockRequest).withHttpHeaders(("x-api-key", "foo"))
     }
 
     "forward the query string data" in new TestScopeBasicAuth {
       new TestService().get(Seq("fake-id"), Seq("foo" -> "bar"))
-      verify(mockRequest).withQueryString(("foo", "bar"))
+      verify(mockRequest).withQueryStringParameters(("foo", "bar"))
     }
 
     "forward the headers" in new TestScopeBasicAuth {
       implicit val requestHeaders: RequestHeaders = Seq("X-Unique-Id" -> "bar")
       new TestService().get(Seq("fake-id"), Seq.empty)
-      verify(mockRequest).withHeaders(("X-Unique-Id", "bar"))
+      verify(mockRequest).withHttpHeaders(("X-Unique-Id", "bar"))
     }
 
     "strip whitespaces and newline from the parameter" in new TestScopeBasicAuth {
@@ -134,18 +134,18 @@ class AbstractServiceTest extends PlaySpec with MockitoSugar with Status {
 
     "strip nonbreaking whitespace from parameters" in new TestScopeBasicAuth {
       new TestService().get(Seq("strange-whitespaces"), ApiContentSearch(MainTypeParam(List("\u00A0", " ", "\t", "\n"))).getAllParamsUnwrapped)
-      verify(mockRequest).withQueryString()
+      verify(mockRequest).withQueryStringParameters()
     }
 
     "not strip valid parameters" in new TestScopeBasicAuth {
       val parameters = ApiContentSearch(MainTypeParam(List("param1", "\u00A0param2\u00A0", "\u00A0"))).getAllParamsUnwrapped
       new TestService().get(Seq("strange-whitespaces"), parameters)
-      verify(mockRequest).withQueryString("type" → Seq("param1", "param2").mkString(MainTypeParam().operator))
+      verify(mockRequest).withQueryStringParameters("type" → Seq("param1", "param2").mkString(MainTypeParam().operator))
     }
 
     "strip empty elements from the query string" in new TestScopeBasicAuth {
       new TestService().get(Seq("x"), Seq("spaces" → " \n", "trim" → "   value   "))
-      verify(mockRequest).withQueryString(("trim", "value"))
+      verify(mockRequest).withQueryStringParameters(("trim", "value"))
     }
 
     "will return the expected result" in new TestScopeBasicAuth {

@@ -70,19 +70,19 @@ trait AbstractService[T] extends Strings with Loggable with Status with HeaderNa
     val filteredParameters = parameters.map { case (k, v) ⇒ k → stripWhiteSpaces(v) }.filter(_._2.nonEmpty)
 
     val getRequest: WSRequest = ws.url(url)
-      .withQueryString(filteredParameters: _*)
+      .withQueryStringParameters(filteredParameters: _*)
 
     val authenticatedGetRequest = config.credentials match {
       case Right(basicAuth) ⇒ getRequest
         .withAuth(username = basicAuth._1, password = basicAuth._2, WSAuthScheme.BASIC)
 
       case Left(apiKey) ⇒ getRequest
-        .withHeaders(HEADER_API_KEY → apiKey)
+        .withHttpHeaders(HEADER_API_KEY → apiKey)
     }
     log.debug(s"HTTP GET to ${authenticatedGetRequest.uri}")
 
     authenticatedGetRequest
-      .withHeaders(forwardHeaders(forwardedRequestHeaders): _*)
+      .withHttpHeaders(forwardHeaders(forwardedRequestHeaders): _*)
       .get().map { response ⇒
 
       context.stop()
