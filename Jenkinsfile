@@ -45,19 +45,15 @@ node('medium') {
 
 
             stage('Publish') {
-                withCredentials([[$class: 'StringBinding', credentialsId: 'BINTRAY_API_KEY_CI_WELTN24', variable: 'BINTRAY_API_KEY_CI_WELTN24']]) {
-                    writeFile file: '~/.bintray/.credentials', text: """realm = Bintray API Realm
-host = api.bintray.com
-user = ci-weltn24
-password = ${env.BINTRAY_API_KEY_CI_WELTN24}"""
+                withCredentials([[$class: 'StringBinding', credentialsId: 'BINTRAY_API_KEY_CI_WELTN24', variable: 'BINTRAY_PASS']]) {
+                    // provide BINTRAY_{USER,PASS} as of https://github.com/sbt/sbt-bintray/blob/master/notes/0.5.0.markdown
+                    env.BINTRAY_USER = "ci-weltn24"
+                    wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
+                        sh './sbt publish'
+                    }
+                    slackSend channel: 'section-tool-2', message: "Successfully published a new WeltContentApiClient version: ${env.BUILD_URL}"
                 }
-
-                wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
-                    sh './sbt publish'
-                }
-                slackSend channel: 'section-tool-2', message: "Successfully published a new WeltContentApiClient version: ${env.BUILD_URL}"
             }
-
         }
     } catch (Exception e) {
         slackSend channel: 'section-tool-2', message: "Build failed: ${env.BUILD_URL}"
