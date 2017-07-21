@@ -1,4 +1,4 @@
-node('large') {
+node {
 
     stage('Git') {
         checkout scm
