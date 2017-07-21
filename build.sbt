@@ -69,7 +69,7 @@ val clientDependencySettings = Seq(
     "com.typesafe.play" %% "play-cache" % "2.6.0-RC2" % Provided,
     "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
 
-    "de.welt" %% "metrics-play" % "2.6.0-RC2_33",
+    "de.welt" %% "metrics-play" % "2.6.2_37",
 
     "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0-RC1" % Test,
     "org.mockito" % "mockito-core" % "1.10.19" % Test
