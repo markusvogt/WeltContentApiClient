@@ -43,16 +43,16 @@ val frontendDependencyManagementSettings = Seq(
 
 val coreDependencySettings = Seq(
   libraryDependencies ++= Seq(
-    "com.typesafe.play" %% "play-json" % "2.6.0-RC2" % Provided,
+    "com.typesafe.play" %% "play-json" % PlayVersion % Provided,
     "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
-    "com.typesafe.play" %% "play-cache" % "2.6.0-RC2" % Provided,
+    "com.typesafe.play" %% "play-cache" % PlayVersion % Provided,
     // Info:
     // Prevent compile warnings of: `Class javax.annotation.Nullable not found - continuing with a stub.`
     "com.google.code.findbugs" % "jsr305" % "3.0.1" % Compile,
     "com.google.inject" % "guice" % "4.1.0",
 
     "org.mockito" % "mockito-core" % "1.10.19" % Test,
-    "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0-RC1" % Test
+    "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.1" % Test
   )
 )
 val clientDependencySettings = Seq(
