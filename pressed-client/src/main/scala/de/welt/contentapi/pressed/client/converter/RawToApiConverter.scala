@@ -128,7 +128,8 @@ class RawToApiConverter @Inject()(inheritanceCalculator: InheritanceCalculator) 
       logo = rawChannel.config.sponsoring.logo,
       slogan = rawChannel.config.sponsoring.slogan,
       hidden = Some(rawChannel.config.sponsoring.hidden),
-      link = rawChannel.config.sponsoring.link.map(ref ⇒ ApiReference(ref.label, ref.path))
+      link = rawChannel.config.sponsoring.link.map(ref ⇒ ApiReference(ref.label, ref.path)),
+      brandstation = rawChannel.config.sponsoring.brandstation
     )
   }
 

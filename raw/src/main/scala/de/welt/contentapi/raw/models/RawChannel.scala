@@ -336,11 +336,13 @@ case class RawChannelHeader(logo: Option[String] = None,
   *               E.g. "Philips - Es gibt immer einen Weg, das Leben besser zu machen"
   * @param hidden hide only the sponsoring. Default = `false`
   * @param link   Optional link for the logo.
+  * @param brandstation   Optional type of Brandstation if the partner is part of brandstation.
   */
 case class RawChannelSponsoring(logo: Option[String] = None,
                                 slogan: Option[String] = None,
                                 hidden: Boolean = false,
-                                link: Option[RawSectionReference] = None)
+                                link: Option[RawSectionReference] = None,
+                                brandstation: Option[String] = None)
 
 /**
   * Stored values for CMCF and Janus2. Should not be used by any clients.

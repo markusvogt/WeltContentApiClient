@@ -69,7 +69,8 @@ object RawReads {
         logo = underlying.get("logo").map(_.as[String]),
         slogan = underlying.get("slogan").map(_.as[String]),
         hidden = underlying.get("hidden").map(_.as[Boolean]).getOrElse(defaults.hidden),
-        link = underlying.get("link").map(_.as[RawSectionReference])
+        link = underlying.get("link").map(_.as[RawSectionReference]),
+        brandstation = underlying.get("brandstation").map(_.as[String])
       ))
       case err@_ ⇒ jsErrorInvalidJson(err)
     }

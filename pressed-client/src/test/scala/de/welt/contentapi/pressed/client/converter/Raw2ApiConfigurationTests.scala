@@ -33,7 +33,8 @@ class Raw2ApiConfigurationTests extends PlaySpec {
       logo = Some("logo"),
       slogan = Some("slogan"),
       hidden = true,
-      link = Some(RawSectionReference(Some(""), Some("/link-for-sponsor-logo.html")))
+      link = Some(RawSectionReference(Some(""), Some("/link-for-sponsor-logo.html"))),
+      brandstation = Some("presented")
     )
     val rawChannelCommercial = RawChannelCommercial(
       definesAdTag = true,
@@ -176,6 +177,10 @@ class Raw2ApiConfigurationTests extends PlaySpec {
       private val rawSponsoringLink = rawChannelSponsoring.link.map(r ⇒ (r.label, r.path))
 
       apiSponsoringLink mustEqual rawSponsoringLink
+    }
+
+    "convert `brandstation`" in new TestScopeConfiguration {
+      apiSponsoringConfiguration.brandstation mustBe rawChannelSponsoring.brandstation
     }
   }
 
