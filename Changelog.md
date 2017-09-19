@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.18.0 (2017-09-19)
+
+### Changes
+- [RAW] added param `brandstation` as part of `RawChannelSponsoring`
+- [PRESSED] added param `brandstation` as part of `ApiSponsoringConfiguration`
+
 ## 0.14.0 (2017-04-12)
 
 #### Breaking Changes

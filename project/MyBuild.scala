@@ -13,7 +13,7 @@ object MyBuild extends Build {
   val forScala2_4 = Option(System.getenv("PLAY24")).exists(_.toBoolean)
 
   val playVersion = if (forScala2_4) "2.4.8" else "2.5.10"
-  private val actualVersion: String = s"0.17.$buildNumber"
+  private val actualVersion: String = s"0.18.$buildNumber"
 
   scalaVersion := "2.11.8"
 
