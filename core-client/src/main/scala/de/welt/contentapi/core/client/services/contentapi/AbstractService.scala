@@ -89,10 +89,13 @@ abstract class AbstractService[T](ws: WSClient,
   /**
     * @param urlArguments            string interpolation arguments for endpoint. e.g. /foo/%s/bar/%s see [[java.lang.String#format}]]
     * @param parameters              URL parameters to be sent with the request
+    * @param headers                 optional http headers to be sent to the backend
     * @param forwardedRequestHeaders forwarded request headers from the controller e.g. API key
     * @return
     */
-  def get(urlArguments: Seq[String] = Nil, parameters: Seq[(String, String)] = Nil)
+  def get(urlArguments: Seq[String] = Nil,
+          parameters: Seq[(String, String)] = Nil,
+          headers: Seq[(String, String)] = Nil)
          (implicit forwardedRequestHeaders: RequestHeaders = Seq.empty): Future[T] = {
 
     val context = initializeMetricsContext(config.serviceName)
@@ -103,6 +106,7 @@ abstract class AbstractService[T](ws: WSClient,
 
     val getRequest: WSRequest = ws.url(url)
       .withQueryStringParameters(filteredParameters: _*)
+      .addHttpHeaders(headers: _*)
       .addHttpHeaders(forwardHeaders(forwardedRequestHeaders): _*)
 
     val preparedRequest = config.credentials match {

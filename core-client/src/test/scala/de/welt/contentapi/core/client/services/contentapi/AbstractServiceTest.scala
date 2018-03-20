@@ -103,6 +103,12 @@ class AbstractServiceTest extends PlaySpec with MockitoSugar with Status with Te
       verify(mockRequest).withQueryStringParameters(("foo", "bar"))
     }
 
+
+    "will send headers to the backend" in new TestScopeBasicAuth {
+      new TestService().get(Seq("fake-id"), Seq.empty, headers = Seq("header-name" -> "header-value"))
+      verify(mockRequest).addHttpHeaders(("header-name", "header-value"))
+    }
+
     "forward the headers" in new TestScopeBasicAuth {
       implicit val requestHeaders: RequestHeaders = Seq("X-Unique-Id" -> "bar")
       new TestService().get(Seq("fake-id"), Seq.empty)
