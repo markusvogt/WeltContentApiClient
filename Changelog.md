@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3 (2018-03-20)
+
+- add optional http headers in AbstractService
+
 ## 1.2 bugfix (2018-03-16)
 
 - definition which Exceptions will cause the breaker to stay open or allow close. e.g.
